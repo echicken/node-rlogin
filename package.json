@@ -1,0 +1,26 @@
+{	"name" : "rlogin",
+	"version" : "0.0.1",
+	"license" : "BSD-3-Clause",
+	"description" : "An rlogin client for node.js.",
+	"author" : {
+		"name" : "echicken",
+		"email" : "echicken@bbs.electronicchicken.com"
+	},
+	"contributors" : [
+		{	"name" : "echicken",
+			"email" : "echicken@bbs.electronicchicken.com"
+		}
+	],
+	"main" : "./index.js",
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/echicken/node-rlogin.git"
+	},
+	"engines" : {
+		"node" : ">= 0.10.24"
+	},
+	"keywords" : [
+		"rlogin",
+		"client"
+	]
+}
