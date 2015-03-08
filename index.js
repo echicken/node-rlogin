@@ -7,14 +7,16 @@ var RLogin = function(options) {
 	var self = this;
 	events.EventEmitter.call(this);	
 
-	const	DC1 = 0x11,
+	const	CAN = 0x18,
+			CR = 0x0D,
+			DC1 = 0x11,
 			DC3 = 0x13,
-			CR = 0x0D;
-			LF = 0x0A;
-			CAN = 0x18;
-			EOT = 0x04,
-			SUB = 0x1A,
+			DOT = 0x2E,
 			EOM = 0x19,
+			EOT = 0x04,
+			LF = 0x0A,
+			SUB = 0x1A,
+			// Unused, for now:
 			DISCARD = 0x02,
 			RAW = 0x10,
 			COOKED = 0x20,
@@ -38,7 +40,7 @@ var RLogin = function(options) {
 	};
 
 	var clientEscapes = {
-		0x2E : self.disconnect,
+		DOT : self.disconnect,
 		EOT : self.disconnect,
 		SUB : function() {
 			state.suspendInput = (state.suspendInput) ? false : true;
@@ -242,10 +244,8 @@ var RLogin = function(options) {
 			if(!state.suspendOutput)
 				self.emit("data", new Buffer(temp));
 			*/
-			if(!state.suspendOutput) {
-				console.log("Emitting");
+			if(!state.suspendOutput)
 				self.emit("data", data);
-			}
 		}
 	);
 
@@ -255,7 +255,6 @@ var RLogin = function(options) {
 
 	// Send a Window Change Control Sequence
 	this.sendWCCS = function() {
-		console.log("Sending WCCS");
 		var magicCookie = new Buffer([0xFF, 0xFF, 0x73, 0x73]);
 		var rcxy = new Buffer(8);
 		rcxy.writeUInt16LE(properties.rows, 0);
