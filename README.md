@@ -29,6 +29,7 @@ rlogin.on(
 	"connect",
 	function(state) {
 		console.log((state) ? "Connected" : "Disconnected");
+		rlogin.send("Hi guise, here I am on this stupid rlogin server.");
 	}
 );
 
