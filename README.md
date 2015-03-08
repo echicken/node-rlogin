@@ -5,7 +5,7 @@ Certain aspects of the protocol aren't readily doable with node's net.Socket, bu
 
 Needs some work and tidying up.
 
-'''js
+```js
 var RLogin = require('rlogin');
 
 var rlogin = new RLogin(
@@ -40,4 +40,4 @@ rlogin.on(
 );
 
 rlogin.connect();
-''' 
+``` 
