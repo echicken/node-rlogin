@@ -7,6 +7,12 @@ Needs some work and tidying up.
 
 Has some untested features which I might document someday.  There are some relevant comments in index.js.
 
+###Installation
+
+```sh
+npm install rlogin
+```
+
 ###Example
 
 ```js
