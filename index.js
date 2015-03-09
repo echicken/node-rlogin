@@ -22,6 +22,8 @@ var RLogin = function(options) {
 			COOKED = 0x20,
 			WINDOW = 0x80;
 
+	/*	While 'connected' is exposed via getter/setter, it's only marginally
+		useful.  The rest are for internal use only at the moment. */
 	var state = {
 		'connected' : false,
 		'cooked' : true,
@@ -31,6 +33,9 @@ var RLogin = function(options) {
 		'clientHasEscaped' : false
 	};
 
+	/*	These defaults can be adjusted via this.rows, this.columns, etc.
+		They are used when sending a Window Change Control Sequence to the
+		server.	*/
 	var properties = {
 		'rows' : 24,
 		'columns' : 80,
@@ -39,6 +44,7 @@ var RLogin = function(options) {
 		'clientEscape' : '~'
 	};
 
+	// As suggested by RFC1282
 	var clientEscapes = {
 		DOT : self.disconnect,
 		EOT : self.disconnect,
@@ -156,7 +162,7 @@ var RLogin = function(options) {
 		if(!state.connected)
 			return;
 		state.connected = false;
-		self.emit("connect", false);
+		self.emit("disconnect", true);
 	}
 
 	var handle = new net.Socket();
@@ -201,8 +207,8 @@ var RLogin = function(options) {
 					else
 						return;
 				} else {
+					self.emit("connect", false);
 					self.disconnect();
-					self.emit("error", "RLogin: failed to establish connection.");					
 				}
 			}
 
@@ -249,9 +255,9 @@ var RLogin = function(options) {
 		}
 	);
 
-	handle.on("end", handleDisconnect);
-	handle.on("close", handleDisconnect);
-	handle.on("timeout", handleDisconnect);
+	handle.on("end", function() { handleDisconnect(); });
+	handle.on("close", function() { handleDisconnect(); });
+	handle.on("timeout", function() { handleDisconnect(); });
 
 	// Send a Window Change Control Sequence
 	this.sendWCCS = function() {
@@ -265,10 +271,14 @@ var RLogin = function(options) {
 			handle.write(Buffer.concat([magicCookie, rcxy]));
 	}
 
+	// Send 'data' (String or Buffer) to the rlogin server
 	this.send = function(data) {
 
+		if(!state.connected)
+			self.emit("error", "RLogin.send: not connected.");
+
 		if(state.suspendInput)
-			return false;
+			self.emit("error", "RLogin.send: input has been suspended.");
 		
 		if(typeof data == "string" || Array.isArray(data))
 			data = new Buffer(data);
@@ -310,6 +320,13 @@ var RLogin = function(options) {
 
 	}
 
+	/*	If 'ch' is found in client input immediately after the
+		'this.clientEscape' character when:
+			- this is the first input after connection establishment or
+			- these are the first characters on a new line or
+			- these are the first characters after a line-cancel character
+		then the function 'callback' will be called.  Use this to allow
+		client input to trigger a particular action.	*/
 	this.addClientEscape = function(ch, callback) {
 		if(	(typeof ch != "string" && typeof ch != "number")
 			||

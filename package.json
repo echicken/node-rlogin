@@ -1,5 +1,5 @@
 {	"name" : "rlogin",
-	"version" : "0.0.1",
+	"version" : "1.0.0",
 	"license" : "BSD-3-Clause",
 	"description" : "An rlogin client for node.js.",
 	"author" : {

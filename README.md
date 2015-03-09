@@ -5,9 +5,14 @@ Certain aspects of the protocol aren't readily doable with node's net.Socket, bu
 
 Needs some work and tidying up.
 
+Has some untested features which I might document someday.  There are some relevant comments in index.js.
+
+###Example
+
 ```js
 var RLogin = require('rlogin');
 
+// All of these options are required
 var rlogin = new RLogin(
 	{	'clientUsername' : "myPassword",
 		'serverUsername' : "myUsername",
@@ -18,6 +23,7 @@ var rlogin = new RLogin(
 	}
 );
 
+// If there was an error ...
 rlogin.on(
 	"error",
 	function(err) {
@@ -25,14 +31,33 @@ rlogin.on(
 	}
 );
 
+// If we connected or failed to connect ...
 rlogin.on(
 	"connect",
+	/*	The 'connect' event handler will be supplied with one argument,
+		a boolean indicating whether or not the connection was established. */
 	function(state) {
-		console.log((state) ? "Connected" : "Disconnected");
-		rlogin.send("Hi guise, here I am on this stupid rlogin server.");
+		if(state) {
+			console.log("Connected.");
+			// Send a String or Buffer to the server.
+			rlogin.send("Hi guise, here I am on this stupid rlogin server.");
+			// That was fun.  Let's hang up now.
+			rlogin.disconnect();
+		} else {
+			console.log("Failed to connect.");
+		}
 	}
 );
 
+// If we've been disconnected ...
+rlogin.on(
+	"disconnect",
+	function() {
+		console.log("Disconnected.");
+	}
+);
+
+// If data (a Buffer) has been received from the server ...
 rlogin.on(
 	"data",
 	function(data) {
@@ -40,5 +65,6 @@ rlogin.on(
 	}
 );
 
+// Now that the events will be handled properly, we can connect ...
 rlogin.connect();
 ``` 
